@@ -35,7 +35,9 @@ def greeting_func():
 
     # Asking for name:
     name = input(
-    'To customize this experience, please enter your name (to skip press enter): ').strip().title()
+        'To customize this experience, please enter your name (to skip press enter): '
+    ).strip().title()
+
     if name == '':
         name = 'reviewer'
 
@@ -90,8 +92,8 @@ To change it enter the new name: ''').strip().title()
         try:
             file_name = cities[city]
 
-        except:
-            print('\nSomething went wrong! Make sure to type city name correctrly!')
+        except KeyError:
+            print('\nSomething went wrong! Make sure to type city name correctly!')
 
         else:
             # Loading data:
@@ -101,7 +103,7 @@ To change it enter the new name: ''').strip().title()
             print('Done!')
 
             # Renaming columns for more convenience:
-            df.rename(columns=lambda x:x.strip().lower().replace(' ', '_'), inplace=True)
+            df.rename(columns=lambda x: x.strip().lower().replace(' ', '_'), inplace=True)
 
             # Creating the necessary extra columns:
             df['start_day'] = df['start_time'].dt.strftime('%A')
@@ -139,9 +141,9 @@ def exploring_func(df):
             
             # Validating input(s):
             if explore != '' and not explore.isnumeric():
-                raise Exception
+                raise ValueError
                 
-        except:
+        except ValueError:
             print('\nPlease, enter the number correctly!')
             
         else:
@@ -190,15 +192,15 @@ def filtering_func(df):
             month = input('You can enter more than one day separated by a space: ').strip().title().split(' ')
             
             time_filter = day + month
-            time_filter =[x for x in time_filter if x in df[['start_day', 'start_month']].to_numpy()]
+            time_filter =[ x for x in time_filter if x in df[['start_day', 'start_month']].to_numpy()]
 
             # Validating inputs:
             if len(time_filter) == 0:
                 raise Exception
 
-        # Handling erros:
+        # Handling errors:
         except:
-            print('\nSomething went wrong! Make sure to type day / month name correctrly')
+            print('\nSomething went wrong! Make sure to type day / month name correctly')
 
         else:
             
@@ -213,7 +215,7 @@ def filtering_func(df):
 
 
 # Defining available options for statistics & their associated result name, column name, action:
-options = {'1': {'result':'Most common month:',
+options = {'1': {'result': 'Most common month:',
                  'column': 'start_month',
                  'return_func': lambda series: series.mode()[0]},
            '2': {'result': 'Most common day of the week:',
@@ -232,8 +234,8 @@ options = {'1': {'result':'Most common month:',
                  'column': 'start_to_end',
                  'return_func': lambda series: series.mode()[0]},
            '7': {'result': 'Total travel time (in hours):',
-                'column': 'trip_uration',
-                'return_func': lambda series: series.sum()},
+                 'column': 'trip_uration',
+                 'return_func': lambda series: series.sum()},
            '8': {'result': 'Average travel time (in hours):',
                  'column': 'trip_duration',
                  'return_func': lambda series: round(series.mean(), 2)},
@@ -298,11 +300,11 @@ Or you can skip at anytime by pressing enter.''')
             # Asking for the required statistics:
             option = input('Number: ').strip().lower()
             
-            #validating option(s):
+            # Validating option(s):
             if option != 'all' and option not in options:
-                raise Exception
+                raise ValueError
                 
-        except:
+        except ValueError:
             print('\nSomething went wrong! Make sure to type your option correctrly')
             
         else:
@@ -360,9 +362,9 @@ Data analysis for {city} is completed''')
             try:
                 restart = input('Would you like to explore another data set? (y/n) ').strip().lower()
                 if restart != 'y' and restart != 'n':
-                    raise Exception
+                    raise ValueError
                 
-            except:
+            except ValueError:
                 print('\nSomething went wrong! Make sure to type correctrly')
             
             else:
