@@ -15,7 +15,6 @@ MONTHS = ['January', 'February', 'March', 'April',
 
 
 def load_data():
-
     """Loads one of the three datasets.
 
     Args:
@@ -52,7 +51,6 @@ def load_data():
 
 
 def get_data_ready(raw_data):
-
     """Set the correct data types & create new columns as needed.
 
     Args:
@@ -88,7 +86,6 @@ def get_data_ready(raw_data):
 
 
 def explore_data(data):
-
     """Views a segment of data according to the user's request.
 
     Args:
@@ -114,14 +111,13 @@ def explore_data(data):
         if rows.isnumeric():
             rows = int(rows)
             print('\n')
-            print(data[i:i+rows])
+            print(data[i:i + rows])
             i += rows
         else:
             print("\nPlease, make sure to type number correctly!\n")
 
 
 def filter_data(data):
-
     """Filters the data according to the user's request.
 
     Args:
@@ -158,8 +154,31 @@ def filter_data(data):
             print("Please, make sure to type day / month name correctly!\n")
 
 
-def time_stats(data):
+def timer(fn):
+    """Time the decorated function in an elegant way.
 
+    Args:
+        fn (function): the function being decorated.
+
+    Returns:
+        wrapper_fn (function): the decorated function.
+    """
+
+    # Define the wrapper inner function
+    def wrapper_fn(*args, **kwargs):
+        t_0 = dt.datetime.now()
+        output = fn(*args, **kwargs)
+        t_delta = (dt.datetime.now() - t_0).total_seconds()
+        print(f"\nThis took about {round(t_delta, 2)} seconds!")
+        print('*' * 20)
+        return output
+
+    # Return the function with extended behavior
+    return wrapper_fn
+
+
+@timer
+def time_stats(data):
     """Displays statistics on the most frequent times of travel.
 
     Args:
@@ -168,9 +187,6 @@ def time_stats(data):
     Returns:
         This function returns nothing.
     """
-
-    # Marking the start time
-    start = dt.datetime.now()
 
     # The most common month
     most_common_month = data['month'].value_counts(ascending=False).index[0]
@@ -184,14 +200,9 @@ def time_stats(data):
     most_common_hour = data['start_hour'].value_counts(ascending=False).index[0]
     print(f"Most common travel hour: {most_common_hour}.")
 
-    # Marking the end time
-    end = dt.datetime.now()
-    time_delta = end - start
-    print(f"\nThis took {time_delta.total_seconds()} seconds.")
 
-
+@timer
 def station_stats(data):
-
     """
     Displays statistics on the most popular stations and trip.
 
@@ -201,9 +212,6 @@ def station_stats(data):
     Returns:
         This function returns nothing.
     """
-
-    # Marking the start time
-    start = dt.datetime.now()
 
     # The most common start station
     most_common_start = data['start_station'].value_counts(ascending=False).index[0]
@@ -217,14 +225,9 @@ def station_stats(data):
     most_common_combination = data['start_end_combination'].value_counts(ascending=False).index[0]
     print(f"Most common start-end combination: {most_common_combination}.")
 
-    # Marking the end time
-    end = dt.datetime.now()
-    time_delta = end - start
-    print(f"\nThis took {time_delta.total_seconds()} seconds.")
 
-
+@timer
 def trip_duration_stats(data):
-
     """
     Displays statistics on the total and average trip duration.
 
@@ -235,25 +238,17 @@ def trip_duration_stats(data):
         This function returns nothing.
     """
 
-    # Marking the start time
-    start = dt.datetime.now()
-
     # The mean travel time
     mean_travel_time = data['travel_time'].mean()
     print(f"Mean travel time: {round(mean_travel_time, 2)} minutes.")
 
     # The total travel time
     total_travel_time = data['travel_time'].sum()
-    print(f"Total travel time: {round(total_travel_time/60, 2)} hours.")
-
-    # Marking the end time
-    end = dt.datetime.now()
-    time_delta = end - start
-    print(f"\nThis took {time_delta.total_seconds()} seconds.")
+    print(f"Total travel time: {round(total_travel_time / 60, 2)} hours.")
 
 
+@timer
 def user_stats(data):
-
     """
     Displays statistics on bike-share users.
 
@@ -297,14 +292,8 @@ def user_stats(data):
     else:
         print("\nNOTE: this dataset has no information about user birth year.")
 
-    # Marking the end time
-    end = dt.datetime.now()
-    time_delta = end - start
-    print(f"\nThis took {time_delta.total_seconds()} seconds.")
-
 
 def main():
-
     """Executes the script."""
 
     outer_loop = True
@@ -325,22 +314,18 @@ def main():
         # Filter data
         city_data_filtered = filter_data(city_data)
 
-        # View time stats
+        # Display time stats
         print('*' * 20)
         time_stats(city_data_filtered)
 
-        # View station stats
-        print('*' * 20)
+        # Display station stats
         station_stats(city_data_filtered)
 
-        # View trip duration stats
-        print('*' * 20)
+        # Display trip duration stats
         trip_duration_stats(city_data_filtered)
 
-        # View user stats
-        print('*' * 20)
+        # Display user stats
         user_stats(city_data_filtered)
-        print('*' * 20)
 
         # Ask if the user wants to repeat the whole process
         print("\nYou can proceed to analyzing another dataset if you would like!")
