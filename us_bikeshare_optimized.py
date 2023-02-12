@@ -1,17 +1,30 @@
-import pandas as pd
 import datetime as dt
+import pandas as pd
 
 # Declare some CONSTANTS for validating user inputs
-CITIES = {'Chicago': './data/chicago.csv',
-          'New York': './data/new_york_city.csv',
-          'Washington': './data/washington.csv'}
+CITIES = {
+    "Chicago": "./data/chicago.csv",
+    "New York": "./data/new_york_city.csv",
+    "Washington": "./data/washington.csv",
+}
 
-DAYS = ['Saturday', 'Sunday', 'Monday', 'Tuesday',
-        'Wednesday', 'Thursday', 'Friday']
+DAYS = ["Saturday", "Sunday", "Monday",
+        "Tuesday", "Wednesday", "Thursday", "Friday"]
 
-MONTHS = ['January', 'February', 'March', 'April',
-          'May', 'June', 'July', 'August',
-          'September', 'October', 'November', 'December']
+MONTHS = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+]
 
 
 def load_data():
@@ -42,8 +55,10 @@ def load_data():
             return None
         elif user_input in CITIES:
             print("\nLoading data..")
-            loaded_data = pd.read_csv(filepath_or_buffer=f"{CITIES[user_input]}",
-                                      parse_dates=['Start Time', 'End Time']).iloc[:, 1:]
+            loaded_data = pd.read_csv(
+                filepath_or_buffer=f"{CITIES[user_input]}",
+                parse_dates=["Start Time", "End Time"],
+            ).iloc[:, 1:]
             print("Done!")
             return loaded_data
         else:
@@ -66,22 +81,27 @@ def get_data_ready(raw_data):
     raw_data.dropna(inplace=True)
 
     # Rename columns
-    raw_data.rename(columns=lambda x: x.replace(' ', '_').lower(), inplace=True)
+    raw_data.rename(columns=lambda x: x.replace(" ", "_").lower(),
+                    inplace=True)
 
     # Reset data type for birth_year
-    if 'birth_year' in raw_data.columns:
-        raw_data['birth_year'] = raw_data['birth_year'].astype(int)
+    if "birth_year" in raw_data.columns:
+        raw_data["birth_year"] = raw_data["birth_year"].astype(int)
 
     # Create new columns as needed
-    raw_data['month'] = raw_data['start_time'].dt.strftime("%B")
-    raw_data['day'] = raw_data['start_time'].dt.strftime("%A")
-    raw_data['start_hour'] = raw_data['start_time'].dt.strftime("%I %p")
-    raw_data['travel_time'] = (raw_data['end_time'] - raw_data['start_time']).dt.total_seconds() // 60
-    raw_data['start_end_combination'] = raw_data['start_station'] + " | " + raw_data['end_station']
+    raw_data["month"] = raw_data["start_time"].dt.strftime("%B")
+    raw_data["day"] = raw_data["start_time"].dt.strftime("%A")
+    raw_data["start_hour"] = raw_data["start_time"].dt.strftime("%I %p")
+    raw_data["travel_time"] = (
+        raw_data["end_time"] - raw_data["start_time"]
+    ).dt.total_seconds() // 60
+    raw_data["start_end_combination"] = (
+        raw_data["start_station"] + " | " + raw_data["end_station"]
+    )
 
     # Return data after processing
     processed_data = raw_data
-    print('Done!')
+    print("Done!")
     return processed_data
 
 
@@ -96,13 +116,13 @@ def explore_data(data):
     """
 
     # Print some user instructions
-    print('\nYou can explore data by viewing a defined numer of rows at a time.')
+    print("\nYou can explore data by viewing a defined number of rows.")
     print("NOTE: you can quit by pressing <enter>.")
 
     i = 0
     while True:
         # Get the user input
-        rows = input('\nNumber of rows: ').strip()
+        rows = input("\nNumber of rows: ").strip()
 
         # Validate the user input
         if not rows:
@@ -110,7 +130,7 @@ def explore_data(data):
             break
         if rows.isnumeric():
             rows = int(rows)
-            print('\n')
+            print("\n")
             print(data[i:i + rows])
             i += rows
         else:
@@ -136,7 +156,7 @@ def filter_data(data):
 
     while True:
         # Get the user filters
-        user_filters = input("\nFilter by: ").strip().title().split(' ')
+        user_filters = input("\nFilter by: ").strip().title().split(" ")
         filter_by = [f for f in user_filters if f in (*DAYS, *MONTHS)]
 
         # Validate the user input
@@ -151,7 +171,7 @@ def filter_data(data):
             return filtered_data
         else:
             print("\nIt appears that you have one or typo(s)!")
-            print("Please, make sure to type day / month name correctly!\n")
+            print("Please, make sure to type day/month name correctly!\n")
 
 
 def timer(fn):
@@ -170,7 +190,7 @@ def timer(fn):
         output = fn(*args, **kwargs)
         t_delta = (dt.datetime.now() - t_0).total_seconds()
         print(f"\nThis took about {round(t_delta, 2)} seconds!")
-        print('*' * 20)
+        print("*" * 20)
         return output
 
     # Return the function with extended behavior
@@ -189,15 +209,15 @@ def time_stats(data):
     """
 
     # The most common month
-    most_common_month = data['month'].value_counts(ascending=False).index[0]
+    most_common_month = data["month"].value_counts(ascending=False).index[0]
     print(f"Most common travel month: {most_common_month},")
 
     # The most common month
-    most_common_day = data['day'].value_counts(ascending=False).index[0]
+    most_common_day = data["day"].value_counts(ascending=False).index[0]
     print(f"Most common travel day: {most_common_day},")
 
     # The most common month
-    most_common_hour = data['start_hour'].value_counts(ascending=False).index[0]
+    most_common_hour = data["start_hour"].value_counts(ascending=False).index[0]
     print(f"Most common travel hour: {most_common_hour}.")
 
 
@@ -214,15 +234,17 @@ def station_stats(data):
     """
 
     # The most common start station
-    most_common_start = data['start_station'].value_counts(ascending=False).index[0]
+    most_common_start = data["start_station"].value_counts(ascending=False).index[0]
     print(f"Most common start-end combination: {most_common_start}.")
 
     # The most common end station
-    most_common_end = data['end_station'].value_counts(ascending=False).index[0]
+    most_common_end = data["end_station"].value_counts(ascending=False).index[0]
     print(f"Most common start-end combination: {most_common_end}.")
 
     # The most common start-end combination
-    most_common_combination = data['start_end_combination'].value_counts(ascending=False).index[0]
+    most_common_combination = (
+        data["start_end_combination"].value_counts(ascending=False).index[0]
+    )
     print(f"Most common start-end combination: {most_common_combination}.")
 
 
@@ -239,11 +261,11 @@ def trip_duration_stats(data):
     """
 
     # The mean travel time
-    mean_travel_time = data['travel_time'].mean()
+    mean_travel_time = data["travel_time"].mean()
     print(f"Mean travel time: {round(mean_travel_time, 2)} minutes.")
 
     # The total travel time
-    total_travel_time = data['travel_time'].sum()
+    total_travel_time = data["travel_time"].sum()
     print(f"Total travel time: {round(total_travel_time / 60, 2)} hours.")
 
 
@@ -259,35 +281,32 @@ def user_stats(data):
         This function returns nothing.
     """
 
-    # Marking the start time
-    start = dt.datetime.now()
-
     # The counts of user type
     subscribers = len(data.query("user_type == 'Subscriber'"))
     customers = len(data.query("user_type == 'Customer'"))
-    print(f"Counts of user types:")
+    print("Counts of user types:")
     print(f"  1. Subscribers: {subscribers},")
     print(f"  2. Customers: {customers}.")
 
     # The counts of gender
-    if 'gender' in data.columns:
+    if "gender" in data.columns:
         males = len(data.query("gender == 'Male'"))
         females = len(data.query("gender == 'Female'"))
-        print(f"\nCounts of user genders:")
+        print("\nCounts of user genders:")
         print(f"  1. Males: {males},")
         print(f"  2. Females: {females}.")
     else:
         print("\nNOTE: this dataset has no information about user genders.")
 
     # The earliest, most recent, and most common year of birth
-    if 'birth_year' in data.columns:
-        earliest_birth_year = data['birth_year'].min()
+    if "birth_year" in data.columns:
+        earliest_birth_year = data["birth_year"].min()
         print(f"\nEarliest birth year: {earliest_birth_year},")
 
-        most_recent_birth_year = data['birth_year'].max()
+        most_recent_birth_year = data["birth_year"].max()
         print(f"Most recent birth year: {most_recent_birth_year},")
 
-        most_common_birth_year = data['birth_year'].mode()[0]
+        most_common_birth_year = data["birth_year"].mode()[0]
         print(f"Most common birth year: {most_common_birth_year}.")
     else:
         print("\nNOTE: this dataset has no information about user birth year.")
@@ -315,7 +334,7 @@ def main():
         city_data_filtered = filter_data(city_data)
 
         # Display time stats
-        print('*' * 20)
+        print("*" * 20)
         time_stats(city_data_filtered)
 
         # Display station stats
@@ -332,13 +351,13 @@ def main():
 
         while True:
             print("\nPress any key to restart, or you can quit by pressing <enter>.")
-            to_repeat = input('Restart? ').strip().lower()
-            if to_repeat == '':
+            to_repeat = input("Restart? ").strip().lower()
+            if to_repeat == "":
                 print("\nThank you!")
                 outer_loop = False
                 break
             else:
-                print('\nRestarting..')
+                print("\nRestarting..")
                 break
 
 
